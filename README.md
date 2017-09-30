@@ -3,6 +3,30 @@ Self-Driving Car Engineer Nanodegree Program
 
 ---
 
+## Introduction
+
+The purpose of this project was to "build a PID controller and tune the PID hyperparameters by applying the general processing flow as described in the lessons," and to "test your solution on the simulator!" The simulator provides cross-track error (CTE), speed, and steering angle data via local websocket. The PID (proportional/integral/differential) controller must respond with steering and throttle commands to drive the car reliably around the simulator track. PID control is a simple control scheme where the error between desired and true state is taken as input, and its value, integral and derivatives are multipled by scalars to compute the commanded control input. The proportional term drives the error to zero, however, this results in error oscillating about the set point. To supress these oscillations a derivative term is introduced. 
+
+Finally, due to modeling errors, set point not being zero or other errors, a control based on proportional and derivative term alone can have a drift. To avoid this drift, an integral term is introduced. The integral term accumulates error, and pushes the control in the opposite direction of accumulated error. This results in the steady state offset error to go to zero.
+
+## Effect of P, I & D Components
+The P, or "proportional", component had the most directly observable effect on the car's behavior. It causes the car to steer proportional (and opposite) to the car's distance from the lane center (which is the CTE) - if the car is far to the right it steers hard to the left, if it's slightly to the left it steers slightly to the right.
+
+The D, or "differential", component counteracts the P component's tendency to ring and overshoot the center line. A properly tuned D parameter will cause the car to approach the center line smoothly without ringing.
+
+The I, or "integral", component counteracts a bias in the CTE which prevents the P-D controller from reaching the center line. This bias can take several forms, such as a steering drift (as in the Control unit lessons), but I believe that in this particular implementation the I component particularly serves to reduce the CTE around curves.
+
+
+## Decisions on Hyperparameters
+
+When attempting to perform parameter optimisation using twiddle often the car left the track. So before the complete twiddle implementation it is important to maunally tweak the parameters first such that the car is on te track.Constantly change parameters with settle in steps being 100 and evaluation steps being 2000.After continuous evaluation I settled for the following final values (P: 0.134611, I: 0.000270736, D: 3.05349).
+
+Also, with twiddle the PID controller converges faster but we overshoot drastically at first so it's a tradeoff. The throttle controller was also fine-tuned using the same Twiddle loop.
+
+The throttle control was implemented as,
+
+Throttle=Ksp(speeddesired−speed)−Ks(Steering angle)−DBsteer−DBcte
+
 ## Dependencies
 
 * cmake >= 3.5
